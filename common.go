@@ -4,6 +4,7 @@ import (
 	"golang.org/x/crypto/ssh"
 	"io"
 	"log"
+	"net"
 )
 
 type PtyInfo struct {
@@ -18,6 +19,7 @@ type ReadWriteCloser interface {
 	io.WriteCloser
 }
 
+
 type SSHClientConfig struct {
 	Host              string
 	User              string
@@ -25,6 +27,7 @@ type SSHClientConfig struct {
 	Privatekey        string
 	DialTimeoutSecond int
 	MaxDataThroughput uint64
+	HostKeyCallback   ssh.HostKeyCallback
 }
 
 func makeConfig(user string, password string, privateKey string) (config *ssh.ClientConfig) {
@@ -36,6 +39,9 @@ func makeConfig(user string, password string, privateKey string) (config *ssh.Cl
 		User: user,
 		Auth: []ssh.AuthMethod{
 			ssh.Password(password),
+		},
+		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
+			return nil
 		},
 	}
 	if privateKey != "" {
